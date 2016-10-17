@@ -1,0 +1,111 @@
+body {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    background-color: #eaeaea;
+    margin:100px;
+}
+.main {
+    background-color: #FFF;
+    width: 600px;
+    height:100%;
+    margin:0 auto;
+    /*padding:20px;*/
+}
+.title {
+    color: #000;
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.text{
+    padding-left:50px;
+    padding-right:50px;
+}
+
+.login_form{    
+    text-align: center;
+    padding-top: 20px;
+}
+
+table{
+    width: 310px;
+    text-align: center;
+}
+
+.col1{
+    width: 90px;
+    table-layout: fixed;
+    text-align: left;
+}
+
+.col2{
+    width: auto;
+}
+
+.login_div{
+    width:350px;
+    /*border: 1px solid #eaeaea;*/
+    margin: 0 auto;
+    padding-top: 10px;
+
+}
+
+.footer{
+    color:#cccccc;    
+    text-align: center;    
+}
+
+.content{
+    height: 170px;
+}
+
+.error{    
+    width: auto;
+    padding-right: 20px;
+    padding-left: 20px;
+    margin: 5px;
+    color: red;
+}
+
+.language{
+    text-align: right;        
+}
+
+.login_button {
+  -webkit-border-radius: 4;
+  -moz-border-radius: 4;
+  border-radius: 4px;
+  text-shadow: 1px 1px 30px #666666;
+  -webkit-box-shadow: 0px 1px 6px #000000;
+  -moz-box-shadow: 0px 1px 6px #000000;
+  box-shadow: 0px 1px 6px #000000;
+  font-family: Arial;
+  color: #000000;
+  font-size: 15px;
+  background: #e6e3e3;
+  padding: 5px 20px 5px 20px;
+  text-decoration: none;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  width: 80px;
+}
+
+.login_button:hover {
+  background: #ffffff;
+  background-image: -webkit-linear-gradient(top, #ffffff, #adadad);
+  background-image: -moz-linear-gradient(top, #ffffff, #adadad);
+  background-image: -ms-linear-gradient(top, #ffffff, #adadad);
+  background-image: -o-linear-gradient(top, #ffffff, #adadad);
+  background-image: linear-gradient(to bottom, #ffffff, #adadad);
+  text-decoration: none;
+}
+
+#loading_wrapper{    
+    margin-top: 274px;
+    margin-left: 340px;
+    position: absolute;
+    display: none;       
+}
