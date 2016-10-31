@@ -3,7 +3,7 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated Sep 23, 2016 12:08:20 AM by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-    <class name="ua.training.web.entity.Publisher" table="publisher" catalog="library" optimistic-lock="version">
+    <class name="ua.training.web.entity.Publisher" table="publisher" catalog="library">
         <id name="id" type="java.lang.Long">
             <column name="id" />
             <generator class="identity" />
@@ -11,5 +11,11 @@
         <property name="name" type="string">
             <column name="name" length="100" not-null="true" />
         </property>
+        <set name="books" inverse="true">
+            <key>
+                <column name="publisher_id" not-null="true" />
+            </key>
+            <one-to-many class="ua.training.web.entity.Book" />
+        </set>
     </class>
 </hibernate-mapping>

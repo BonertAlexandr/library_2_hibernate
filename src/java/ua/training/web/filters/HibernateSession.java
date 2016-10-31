@@ -26,14 +26,13 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import org.hibernate.SessionFactory;
-import ua.training.web.db.DataHelper;
 import ua.training.web.entity.HibernateUtil;
 
 /**
  *
  * @author Alexandr
  */
-@WebFilter(filterName = "HibernateSession", urlPatterns = {"/*"})
+@WebFilter(filterName = "HibernateSession", urlPatterns = {"/pages/*", "/DownloadBook"})
 public class HibernateSession implements Filter {
     
     private static final boolean debug = false;

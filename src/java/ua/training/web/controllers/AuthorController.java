@@ -19,37 +19,31 @@ import javax.faces.convert.Converter;
 import javax.faces.model.SelectItem;
 import ua.training.web.comporators.ListComporator;
 import ua.training.web.db.DataHelper;
-import ua.training.web.entity.Genre;
+import ua.training.web.entity.Author;
 
 /**
  *
  * @author Alexandr
  */
-
 @ManagedBean(eager = false)
 @ApplicationScoped
-public class GenreController implements Serializable, Converter{
-    private List<Genre> genreList;
-    private List<SelectItem> selectItems = new ArrayList<SelectItem>();
-    private Map<Long, Genre> map;
-            
-    public GenreController() {        
-        fillGenresAll();        
-        map = new HashMap<Long, Genre>();
-        Collections.sort(genreList, ListComporator.getInstance());
+public class AuthorController implements Serializable, Converter{
 
-        for (Genre g : genreList) {
-            selectItems.add(new SelectItem(g, g.getName()));
-            map.put(g.getId(), g);
+    private List<SelectItem> selectItems = new ArrayList<SelectItem>();
+    private List<Author> list;
+    private Map<Long, Author> map;
+    
+    public AuthorController() {        
+        list = DataHelper.getInstance().getAllAuthors();
+        map = new HashMap<Long, Author>();
+        
+        Collections.sort(list, ListComporator.getInstance());
+        
+        for (Author a : list) {
+            selectItems.add(new SelectItem(a, a.getFio()));
+            map.put(a.getId(), a);
         }
-    }
-    
-    public List<Genre> getGenreList() {
-        return genreList;
-    }
-    
-    private void fillGenresAll() {
-        genreList = DataHelper.getInstance().getAllGenres();
+        
     }
 
     public List<SelectItem> getSelectItems() {
@@ -63,8 +57,7 @@ public class GenreController implements Serializable, Converter{
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        return ((Genre)value).getId().toString();
+        return ((Author) value).getId().toString();
     }
-    
     
 }

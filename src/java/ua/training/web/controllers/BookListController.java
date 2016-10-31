@@ -6,13 +6,13 @@
 package ua.training.web.controllers;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
+import ua.training.web.beans.Pager;
 import ua.training.web.db.DataHelper;
 import ua.training.web.entity.Book;
 import ua.training.web.enums.SearchType;
@@ -24,27 +24,33 @@ import ua.training.web.enums.SearchType;
 @ManagedBean(eager = true)
 @SessionScoped
 public class BookListController implements Serializable {
-
-    private boolean requestFromPage; //check from where request came
+    
     private SearchType searchType; //stores the value of search type(search by author or by title of the book)
-    private List<Book> currentBookList; //current book list to display
-    private String searchString; //input value from search string
-    private int totalBooksCount;
-    private int booksOnPage = 5;//the default numbers of book to display
-    private String currentSql; 
-    private ArrayList<Integer> pageNumbers = new ArrayList<Integer>(); 
-    private int selectedPageNumber = 1;
-    private int selectedGenreId;
+    private String searchString; //input value from search string                
+    private long selectedGenreId;
     private char selectedLetter;
     private boolean editMode;        
+    private Pager<Book> pager = new Pager<Book>();
     
-    public BookListController() {
-        fillBooksAll();        
-    }   
+    public BookListController() {        
+        DataHelper.getInstance().getAllBooks(pager);
+    }           
     
     public void showEdit() {
+        row = -1;
         editMode = true;
     }    
+    
+    public Pager getPager() {
+        return pager;
+    }
+    
+    private transient int row = -1;
+    
+    public int getRow() {
+        row += 1;
+        return row;
+    }
     
     public boolean getEditMode() {
         return editMode;
@@ -62,40 +68,8 @@ public class BookListController implements Serializable {
         this.selectedGenreId = selectedGenreId;        
     }
     
-    public int getSelectedGenreId() {
+    public long getSelectedGenreId() {
         return selectedGenreId;
-    }
-    
-    public void setBooksOnPage(int booksOnPage) {
-        this.booksOnPage = booksOnPage;
-    }
-    
-    public int getBooksOnPage() {
-        return booksOnPage;
-    }
-    
-    public void setPageNumbers(ArrayList<Integer> pageNumbers) {
-        this.pageNumbers = pageNumbers;
-    }
-    
-    public ArrayList<Integer> getPageNumbers() {
-        return pageNumbers;
-    }
-    
-    public void setSelectedPageNumber(int selectedPageNumber) {
-        this.selectedPageNumber = selectedPageNumber;
-    }
-    
-    public int getSelectedPageNumber() {
-        return selectedPageNumber;
-    }
-    
-    public void setTotalBooksCount(int totalBooksCount) {
-        this.totalBooksCount = totalBooksCount;
-    }
-    
-    public int getTotalBooksCount() {
-        return totalBooksCount;
     }
     
     public void setSearchType(SearchType searchType) {
@@ -109,49 +83,47 @@ public class BookListController implements Serializable {
     public SearchType getSearchType() {
         return searchType;
     }
-
-    public List<Book> getCurrentBookList() {
-        return currentBookList;
-    }
     
     public String getSearchString() {
         return searchString;
-    }
-
-    private void fillBooksAll() {
-        currentBookList = DataHelper.getInstance().getAllBooks();
-        fillPageNumbers(currentBookList.size(), booksOnPage);
     }   
     
     public void fillBooksByGenre() {
         cancelEdit();
+        row = -1;
+        
         Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();        
-        int genreId = Integer.parseInt(params.get("genre_id"));
-        submitValue(genreId, ' ', 1, false);
-        currentBookList = DataHelper.getInstance().getBooksByGenre(selectedGenreId);
+        long genreId = Long.parseLong(params.get("genre_id"));        
+        submitValue(genreId, ' ', 1);                
+        
+        DataHelper.getInstance().getBooksByGenre(genreId, pager);
     }    
     
     public void fillBooksByLetter() {
         cancelEdit();
+        row = -1;
+        
         Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();        
-        submitValue(-1, params.get("letter").charAt(0), 1, false);
-        currentBookList = DataHelper.getInstance().getBooksByLetter(selectedLetter);
+        submitValue(-1, params.get("letter").charAt(0), 1);
+        
+        DataHelper.getInstance().getBooksByLetter(selectedLetter, pager);
+//        currentBookList = DataHelper.getInstance().getBooksByLetter(selectedLetter);
     }
     
     public void fillBooksBySearch() {  
         cancelEdit();        
-        submitValue(-1, ' ', 1, false);
+        submitValue(-1, ' ', 1);
+        row = -1;
         
         if (searchString.trim().length() == 0) {
-            currentBookList = DataHelper.getInstance().getAllBooks();
+            DataHelper.getInstance().getAllBooks(pager);
         } else {            
             if (searchType == SearchType.TITLE){
-                currentBookList = DataHelper.getInstance().getBooksByName(searchString);
+                DataHelper.getInstance().getBooksByName(searchString, pager);
             } else {                
-                currentBookList = DataHelper.getInstance().getBooksByAuthor(searchString);
+                DataHelper.getInstance().getBooksByAuthor(searchString, pager);
             }            
         }
-        System.out.println("fillBooksBySearch()");
     }
     
     public Character[] getRussianLetters() {
@@ -192,54 +164,44 @@ public class BookListController implements Serializable {
 
         return letters;
     }
-
-    private void fillPageNumbers(int totalBooksCount, int booksOnPage) {                   
-        int pageCount;
-        if(totalBooksCount % booksOnPage == 0) {
-            pageCount = totalBooksCount > 0 ? totalBooksCount / booksOnPage : 0;
-        } else {
-            pageCount = totalBooksCount > 0 ? totalBooksCount / booksOnPage + 1 : 0;
-        }                
-        pageNumbers.clear();
-        
-        for (int i = 1; i <= pageCount; i++) {
-            pageNumbers.add(i);
-        }
-    }
     
     public String selectPage() {
-        cancelEdit();
-        requestFromPage = true;
+        cancelEdit();        
+        
         Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-        selectedPageNumber = Integer.parseInt(params.get("page_number"));
-//        fillBooksBySQL(currentSql);
+        pager.setSelectedPageNumber(Integer.parseInt(params.get("page_number")));
+        DataHelper.getInstance().runCurrentCriteria();
+
         return "books";
     }
     
-    private void submitValue(int selectedGenreId, char selectedLetter, int selectedPageNumber, boolean requestFromPage) {
+    private void submitValue(long selectedGenreId, char selectedLetter, int selectedPageNumber) {
         this.selectedGenreId = selectedGenreId;
         this.selectedLetter = selectedLetter;
-        this.selectedPageNumber = selectedPageNumber;
-        this.requestFromPage = requestFromPage;
+        pager.setSelectedPageNumber(selectedPageNumber);
     }
     
-    public void updateBooks() {
-        cancelEdit();
-        
+    public void updateBooks() {        
+        row = -1;        
+        DataHelper.getInstance().update();        
+        cancelEdit();   
+        DataHelper.getInstance().refreshList();
     }
     
     public void cancelEdit() {
+        row = -1;
         editMode = false;
-//        for(Book b : currentBookList) {
-//            b.setEdit(false);
-//        }
+
+        List<Book> list = pager.getList();
+        for (Book b : list) {
+            b.setEdit(false);
+        }    
     }
     
     public void booksOnPageChangedListener(ValueChangeEvent e) {        
-        cancelEdit();
-        requestFromPage = false;
-        booksOnPage = Integer.parseInt(e.getNewValue().toString());
-        selectedPageNumber = 1;
-//        fillBooksBySQL(currentSql);
-    }
+        cancelEdit();        
+        pager.setBooksCountOnPage(Integer.parseInt(e.getNewValue().toString()));
+        pager.setSelectedPageNumber(1);
+        DataHelper.getInstance().runCurrentCriteria();
+    }        
 }

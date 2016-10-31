@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import ua.training.web.controllers.BookListController;
-import ua.training.web.db.DataHelper;
+import ua.training.web.entity.Book;
 
 /**
  *
@@ -36,8 +36,10 @@ public class ShowImage extends HttpServlet {
         response.setContentType("image/jpeg");
         OutputStream out = response.getOutputStream();
         try {
-            long id = Long.parseLong(request.getParameter("id"));            
-            byte[] image = DataHelper.getInstance().getImage(id);
+            int index = Integer.parseInt(request.getParameter("index"));
+            BookListController bookListController = (BookListController) request.getSession(false).getAttribute("bookListController");
+            byte[] image = ((Book)bookListController.getPager().getList().get(index)).getImage();
+            
             response.setContentLength(image.length);
             out.write(image);
         } finally {

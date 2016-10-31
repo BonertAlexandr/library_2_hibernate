@@ -19,7 +19,7 @@ import javax.faces.convert.Converter;
 import javax.faces.model.SelectItem;
 import ua.training.web.comporators.ListComporator;
 import ua.training.web.db.DataHelper;
-import ua.training.web.entity.Genre;
+import ua.training.web.entity.Publisher;
 
 /**
  *
@@ -28,28 +28,21 @@ import ua.training.web.entity.Genre;
 
 @ManagedBean(eager = false)
 @ApplicationScoped
-public class GenreController implements Serializable, Converter{
-    private List<Genre> genreList;
+public class PublisherController implements Serializable, Converter{
+    
     private List<SelectItem> selectItems = new ArrayList<SelectItem>();
-    private Map<Long, Genre> map;
-            
-    public GenreController() {        
-        fillGenresAll();        
-        map = new HashMap<Long, Genre>();
-        Collections.sort(genreList, ListComporator.getInstance());
+    private List<Publisher> list;
+    private Map<Long, Publisher> map;
+    
+    public PublisherController() {
+        list =  DataHelper.getInstance().getAllPublishers();
+        map = new HashMap<Long, Publisher>();
+        Collections.sort(list, ListComporator.getInstance());
 
-        for (Genre g : genreList) {
-            selectItems.add(new SelectItem(g, g.getName()));
-            map.put(g.getId(), g);
+        for (Publisher p : list) {
+            selectItems.add(new SelectItem(p, p.getName()));
+            map.put(p.getId(), p);
         }
-    }
-    
-    public List<Genre> getGenreList() {
-        return genreList;
-    }
-    
-    private void fillGenresAll() {
-        genreList = DataHelper.getInstance().getAllGenres();
     }
 
     public List<SelectItem> getSelectItems() {
@@ -63,8 +56,7 @@ public class GenreController implements Serializable, Converter{
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        return ((Genre)value).getId().toString();
+        return ((Publisher)value).getId().toString();
     }
-    
     
 }

@@ -8,41 +8,41 @@ package ua.training.web.entity;
  */
 public class Book  implements java.io.Serializable {
 
-
+     private boolean edit;
      private Long id;
      private Author author;
      private Genre genre;
+     private Publisher publisher;
      private String name;
      private byte[] content;
      private int pageCount;
      private String isbn;
-     private int publishYear;
-     private long publisherId;
+     private int publishYear;     
      private byte[] image;
-
+     private String descr;
+     
     public Book() {
     }
 
 	
-    public Book(Author author, Genre genre, String name, byte[] content, int pageCount, String isbn, int publishYear, long publisherId) {
+    public Book(Author author, Genre genre, Publisher publisher, String name, byte[] content, int pageCount, String isbn, int publishYear) {
         this.author = author;
         this.genre = genre;
+        this.publisher = publisher;
         this.name = name;
-        this.content = content;
         this.pageCount = pageCount;
         this.isbn = isbn;
-        this.publishYear = publishYear;
-        this.publisherId = publisherId;
+        this.publishYear = publishYear;        
     }
-    public Book(Author author, Genre genre, String name, byte[] content, int pageCount, String isbn, int publishYear, long publisherId, byte[] image) {
+    public Book(Author author, Genre genre, Publisher publisher, String name, byte[] content, int pageCount, String isbn, int publishYear, byte[] image) {
        this.author = author;
        this.genre = genre;
+       this.publisher = publisher;
        this.name = name;
        this.content = content;
        this.pageCount = pageCount;
        this.isbn = isbn;
-       this.publishYear = publishYear;
-       this.publisherId = publisherId;
+       this.publishYear = publishYear;       
        this.image = image;
     }
    
@@ -67,6 +67,15 @@ public class Book  implements java.io.Serializable {
     public void setGenre(Genre genre) {
         this.genre = genre;
     }
+    
+    public Publisher getPublisher() {
+        return this.publisher;
+    }
+    
+    public void setPublisher(Publisher publisher) {
+        this.publisher = publisher;
+    }
+    
     public String getName() {
         return this.name;
     }
@@ -102,13 +111,7 @@ public class Book  implements java.io.Serializable {
     public void setPublishYear(int publishYear) {
         this.publishYear = publishYear;
     }
-    public long getPublisherId() {
-        return this.publisherId;
-    }
-    
-    public void setPublisherId(long publisherId) {
-        this.publisherId = publisherId;
-    }
+   
     public byte[] getImage() {
         return this.image;
     }
@@ -116,9 +119,26 @@ public class Book  implements java.io.Serializable {
     public void setImage(byte[] image) {
         this.image = image;
     }
-
-
-
+    
+    public String getDescr() {
+        return this.descr;
+    }
+    
+    public void setDescr(String descr) {
+        this.descr = descr;
+    }
+    
+    public boolean getEdit() {
+        return this.edit;
+    }
+    
+    public void setEdit(boolean edit) {
+        this.edit = edit;
+    }
+    
+    public boolean isEdit() {
+        return edit;
+    }
 
 }
 
