@@ -41,6 +41,7 @@ public class ShowImage extends HttpServlet {
             byte[] image = ((Book)bookListController.getPager().getList().get(index)).getImage();
             
             response.setContentLength(image.length);
+            System.out.println(((Book)bookListController.getPager().getList().get(index)).getName());
             out.write(image);
         } finally {
             out.close();

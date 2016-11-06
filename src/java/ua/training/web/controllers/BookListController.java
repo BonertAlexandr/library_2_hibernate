@@ -11,11 +11,12 @@ import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ValueChangeEvent;
+import org.primefaces.model.LazyDataModel;
 import ua.training.web.beans.Pager;
 import ua.training.web.db.DataHelper;
 import ua.training.web.entity.Book;
 import ua.training.web.enums.SearchType;
+import ua.training.web.models.BookListDataModel;
 
 /**
  *
@@ -30,27 +31,24 @@ public class BookListController implements Serializable {
     private long selectedGenreId;
     private char selectedLetter;
     private boolean editMode;        
-    private Pager<Book> pager = new Pager<Book>();
+    private Pager pager = Pager.getInstance();
+    private LazyDataModel<Book> bookListModel;
     
     public BookListController() {        
-        DataHelper.getInstance().getAllBooks(pager);
-    }           
+        bookListModel = new BookListDataModel();
+    }                       
     
-    public void showEdit() {
-        row = -1;
+    public void showEdit() {        
         editMode = true;
     }    
     
+    public LazyDataModel<Book> getBookListModel() {
+        return bookListModel;
+    }        
+    
     public Pager getPager() {
         return pager;
-    }
-    
-    private transient int row = -1;
-    
-    public int getRow() {
-        row += 1;
-        return row;
-    }
+    }    
     
     public boolean getEditMode() {
         return editMode;
@@ -89,39 +87,36 @@ public class BookListController implements Serializable {
     }   
     
     public void fillBooksByGenre() {
-        cancelEdit();
-        row = -1;
+        cancelEdit();        
         
         Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();        
         long genreId = Long.parseLong(params.get("genre_id"));        
-        submitValue(genreId, ' ', 1);                
+        submitValue(genreId, ' ');                
         
-        DataHelper.getInstance().getBooksByGenre(genreId, pager);
+        DataHelper.getInstance().getBooksByGenre(genreId);
     }    
     
     public void fillBooksByLetter() {
-        cancelEdit();
-        row = -1;
+        cancelEdit();        
         
         Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();        
-        submitValue(-1, params.get("letter").charAt(0), 1);
+        submitValue(-1, params.get("letter").charAt(0));
         
-        DataHelper.getInstance().getBooksByLetter(selectedLetter, pager);
+        DataHelper.getInstance().getBooksByLetter(selectedLetter);
 //        currentBookList = DataHelper.getInstance().getBooksByLetter(selectedLetter);
     }
     
     public void fillBooksBySearch() {  
         cancelEdit();        
-        submitValue(-1, ' ', 1);
-        row = -1;
+        submitValue(-1, ' ');        
         
         if (searchString.trim().length() == 0) {
-            DataHelper.getInstance().getAllBooks(pager);
+            DataHelper.getInstance().getAllBooks();
         } else {            
             if (searchType == SearchType.TITLE){
-                DataHelper.getInstance().getBooksByName(searchString, pager);
+                DataHelper.getInstance().getBooksByName(searchString);
             } else {                
-                DataHelper.getInstance().getBooksByAuthor(searchString, pager);
+                DataHelper.getInstance().getBooksByAuthor(searchString);
             }            
         }
     }
@@ -163,45 +158,25 @@ public class BookListController implements Serializable {
         letters[32] = 'Я';
 
         return letters;
-    }
+    }        
     
-    public String selectPage() {
-        cancelEdit();        
-        
-        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
-        pager.setSelectedPageNumber(Integer.parseInt(params.get("page_number")));
-        DataHelper.getInstance().runCurrentCriteria();
-
-        return "books";
-    }
-    
-    private void submitValue(long selectedGenreId, char selectedLetter, int selectedPageNumber) {
+    private void submitValue(long selectedGenreId, char selectedLetter) {
         this.selectedGenreId = selectedGenreId;
-        this.selectedLetter = selectedLetter;
-        pager.setSelectedPageNumber(selectedPageNumber);
+        this.selectedLetter = selectedLetter;        
     }
     
-    public void updateBooks() {        
-        row = -1;        
+    public void updateBooks() {                   
         DataHelper.getInstance().update();        
         cancelEdit();   
-        DataHelper.getInstance().refreshList();
+        DataHelper.getInstance().populateList();
     }
     
-    public void cancelEdit() {
-        row = -1;
+    public void cancelEdit() {        
         editMode = false;
 
         List<Book> list = pager.getList();
         for (Book b : list) {
             b.setEdit(false);
         }    
-    }
-    
-    public void booksOnPageChangedListener(ValueChangeEvent e) {        
-        cancelEdit();        
-        pager.setBooksCountOnPage(Integer.parseInt(e.getNewValue().toString()));
-        pager.setSelectedPageNumber(1);
-        DataHelper.getInstance().runCurrentCriteria();
-    }        
+    }            
 }

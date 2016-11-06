@@ -232,12 +232,12 @@ ul.nav a:hover, ul.nav a:active, ul.nav a:focus {
 
 .col1{
     vertical-align: top;
-    width: 100px;
+    width: 160px;
 }
 
 .col2{
     vertical-align: top;
-    width: 240px;   
+    width: 200px;   
 }
 
 .col2 a{
@@ -275,7 +275,19 @@ ul.nav a:hover, ul.nav a:active, ul.nav a:focus {
 
 .col3{
     vertical-align: top;
-    width: 350px;
+    
+}
+
+.ui-datatable.book_list thead th,
+.ui-datatable.book_list tbody,
+.ui-datatable.book_list tbody tr,
+.ui-datatable.book_list tbody td {
+    border-style: none;
+}
+
+.book_list{
+    float:left;
+    
 }
 
 .book_details p{
@@ -352,4 +364,11 @@ ul.nav a:hover, ul.nav a:active, ul.nav a:focus {
 #booksForm span img{    
     width: 25px;
     height: 25px;    
+}
+
+.search_type{
+    float:left;
+    width: 10%;
+    text-align: right;
+    margin-top: 5px;
 }

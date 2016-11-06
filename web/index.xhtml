@@ -5,74 +5,74 @@
       xmlns:f="http://java.sun.com/jsf/core">
     <f:view locale="#{localeChanger.localeCode}">
         <h:head>                                
-        <title>#{msg.title}</title>        
-        <h:outputStylesheet library="css" name="style_index.css"/>
-        <h:outputScript library="js" name="library.js" target="head"/>
-    </h:head>
-    <h:body>        
-        <noscript>
-            <h4><p>Включите JavaScript в вашем браузере, чтобы работать с нашим приложением</p></h4>
+            <title>#{msg.title}</title>        
+            <h:outputStylesheet library="css" name="style_index.css"/>
+            <h:outputScript library="js" name="library.js" target="head"/>
+        </h:head>
+        <h:body>        
+            <noscript>
+                <h4><p>Включите JavaScript в вашем браузере, чтобы работать с нашим приложением</p></h4>
 
-            <style type="text/css">
-                .main { display:none; }
-                p { text-align: center; }
-            </style>
+                <style type="text/css">
+                    .main { display:none; }
+                    p { text-align: center; }
+                </style>
 
-        </noscript>        
-        <div class="main">            
-            <div class="content">
-                <div class="language">
-                    <h:form>
-                        <h:selectOneMenu value="#{localeChanger.localeCode}" valueChangeListener="#{localeChanger.localeChangedListner}">
-                            <f:selectItems value="#{localeChanger.localesMap}"/>
-                            <f:ajax event="change" execute="loginForm" render="loginForm title inputInfo footer"/>
-                        </h:selectOneMenu>
-                    </h:form>
-                </div>         
-                <div id="loading_wrapper">
-                    <h:graphicImage library="images" name="splash.gif"/>
+            </noscript>        
+            <div class="main">            
+                <div class="content">
+                    <div class="language">
+                        <h:form>
+                            <h:selectOneMenu value="#{localeChanger.localeCode}" valueChangeListener="#{localeChanger.localeChangedListner}">
+                                <f:selectItems value="#{localeChanger.localesMap}"/>
+                                <f:ajax event="change" execute="loginForm" render="loginForm title inputInfo footer"/>
+                            </h:selectOneMenu>
+                        </h:form>
+                    </div>         
+                    <div id="loading_wrapper">
+                        <h:graphicImage library="images" name="splash.gif"/>
+                    </div>
+                    <p class="title"><h:graphicImage library="images" name="lib.png"/></p>                
+                    <h:panelGroup id="title" layout="block" styleClass="title">
+                        #{msg.title}
+                    </h:panelGroup>
                 </div>
-                <p class="title"><h:graphicImage library="images" name="lib.png"/></p>                
-                <h:panelGroup id="title" layout="block" styleClass="title">
-                    #{msg.title}
-                </h:panelGroup>
-            </div>
-            <div class="login_div">                
-                <h:panelGroup id="inputInfo" layout="block" styleClass="title">
-                    #{msg.input_info}                    
-                </h:panelGroup>
-                <h:form id="loginForm" styleClass="login_form"> 
-                    <h:panelGrid columns="2" columnClasses="col1, col2">
-                        <h:column class="column_left">
-                            <span style="color: red">*</span><h:outputText value="#{msg.input_name}"/>
-                        </h:column>                        
-                        <h:inputText id="username" value="#{user.username}" required="true" requiredMessage="#{msg.login_required}" style="width: 180px;">
-                            <f:validator validatorId="ua.training.web.validators.UsernameValidator"/>
-                            <f:ajax event="keyup" render="loginError"/>
-                        </h:inputText>
-                        <h:column class="column_left">
-                            <span style="color: red">*</span><h:outputText value="#{msg.input_password}"/>
-                        </h:column>
-                        <h:inputSecret id="password" value="#{user.password}" redisplay="true" required="true" requiredMessage="#{msg.password_required}" style="width: 180px;">
-                            <f:validator validatorId="ua.training.web.validators.PasswordValidator"/>
-                            <f:ajax event="keyup" render="loginError"/>
-                        </h:inputSecret>
-                        <f:facet name="footer">                            
-                            <h:panelGroup layout="block" style="position: static">
-                                <h:commandButton action="#{user.login()}" value="#{msg.login}" styleClass="login_button">
-                                    <f:ajax onevent="showProgress" execute="loginForm" render="loginError"/>
-                                </h:commandButton>                                                
-                            </h:panelGroup>                                                            
-                        </f:facet>
-                    </h:panelGrid>                                                                
-                </h:form>
-            </div>
-            <h:messages id="loginError" styleClass="error"/>                                            
-            <h:panelGroup id="footer" layout="block" styleClass="footer">
-                #{msg.author_info}
-            </h:panelGroup>            
-        </div>        
-    </h:body>
+                <div class="login_div">                
+                    <h:panelGroup id="inputInfo" layout="block" styleClass="title">
+                        #{msg.input_info}                    
+                    </h:panelGroup>
+                    <h:form id="loginForm" styleClass="login_form"> 
+                        <h:panelGrid columns="2" columnClasses="col1, col2">
+                            <h:column class="column_left">
+                                <span style="color: red">*</span><h:outputText value="#{msg.input_name}"/>
+                            </h:column>                        
+                            <h:inputText id="username" value="#{user.username}" required="true" requiredMessage="#{msg.login_required}" style="width: 180px;">
+                                <f:validator validatorId="ua.training.web.validators.UsernameValidator"/>
+                                <f:ajax event="keyup" render="loginError"/>
+                            </h:inputText>
+                            <h:column class="column_left">
+                                <span style="color: red">*</span><h:outputText value="#{msg.input_password}"/>
+                            </h:column>
+                            <h:inputSecret id="password" value="#{user.password}" redisplay="true" required="true" requiredMessage="#{msg.password_required}" style="width: 180px;">
+                                <f:validator validatorId="ua.training.web.validators.PasswordValidator"/>
+                                <f:ajax event="keyup" render="loginError"/>
+                            </h:inputSecret>
+                            <f:facet name="footer">                            
+                                <h:panelGroup layout="block" style="position: static">
+                                    <h:commandButton action="#{user.login()}" value="#{msg.login}" styleClass="login_button">
+                                        <f:ajax onevent="showProgress" execute="loginForm" render="loginError"/>
+                                    </h:commandButton>                                                
+                                </h:panelGroup>                                                            
+                            </f:facet>
+                        </h:panelGrid>                                                                
+                    </h:form>
+                </div>
+                <h:messages id="loginError" styleClass="error"/>                                            
+                <h:panelGroup id="footer" layout="block" styleClass="footer">
+                    #{msg.author_info}
+                </h:panelGroup>            
+            </div>                                
+        </h:body>
     </f:view>
 </html>
 

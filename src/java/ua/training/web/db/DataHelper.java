@@ -36,10 +36,12 @@ public class DataHelper {
     private static DataHelper dataHelper;
     private DetachedCriteria bookListCriteria;
     private DetachedCriteria booksCountCriteria;
-    private Pager currentPager;
+    private Pager pager = Pager.getInstance();
     private ProjectionList bookProjectionList;
     
     private DataHelper() {
+        prepareCreterias();
+        
         sessionFactory = HibernateUtil.getSessionFactory();
         
         bookProjectionList = Projections.projectionList();        
@@ -59,6 +61,7 @@ public class DataHelper {
         if (dataHelper == null) {
             dataHelper = new DataHelper();
         }        
+        System.out.println("RETURN DATAHELPER");
         return dataHelper;
     }
     
@@ -66,14 +69,9 @@ public class DataHelper {
         return sessionFactory.getCurrentSession();
     }
     
-    public void getAllBooks(Pager pager) {
-        currentPager = pager;
-        
-        createBooksCountCriteria();
-        runCountCriteria();                
-        
-        createBookListCriteria();        
-        runCurrentCriteria();
+    public void getAllBooks() {                
+        prepareCreterias();
+        populateList();        
     }
     
     public List<Genre> getAllGenres() {
@@ -88,62 +86,42 @@ public class DataHelper {
         return getSession().createCriteria(Publisher.class).list();
     }
     
-    public void getBooksByGenre(long genreId, Pager pager) {
-        currentPager = pager;
-        
+    public void getBooksByGenre(long genreId) {
         Criterion criterion = Restrictions.eq("genre.id", genreId);   
-        createBooksCountCriteria(criterion);
-        runCountCriteria();        
-                
-        createBookListCriteria(criterion);
-        runCurrentCriteria();
+        prepareCreterias(criterion);                        
+        populateList();
     }
     
-    public void getBooksByLetter(Character letter, Pager pager) {                
-        currentPager = pager;
-        
+    public void getBooksByLetter(Character letter) {                        
         Criterion criterion = Restrictions.ilike("name", letter.toString(), MatchMode.START);
-        createBooksCountCriteria(criterion);
-        runCountCriteria();        
-                
-        createBookListCriteria(criterion);
-        runCurrentCriteria();
+        prepareCreterias(criterion);
+        populateList();
     }
     
-    public void getBooksByAuthor(String name, Pager pager) {        
-        currentPager = pager;
-        
+    public void getBooksByAuthor(String name) {        
         Criterion criterion = Restrictions.ilike("author.fio", name, MatchMode.ANYWHERE);
-        createBooksCountCriteria(criterion);
-        runCountCriteria();        
-                
-        createBookListCriteria(criterion);
-        runCurrentCriteria();
+        prepareCreterias(criterion);
+        populateList();
     }
     
-    public void getBooksByName(String bookName, Pager pager) {
-        currentPager = pager;
-        
+    public void getBooksByName(String bookName) {
         Criterion criterion = Restrictions.ilike("name", bookName, MatchMode.ANYWHERE);
-        createBooksCountCriteria(criterion);
-        runCountCriteria();        
-                
-        createBookListCriteria(criterion);
-        runCurrentCriteria();
+        prepareCreterias(criterion);
+        populateList();
     }
     
     public byte[] getContent(Long id) {
-        Criteria criteria = getSession().createCriteria(Book.class);
-        criteria.setProjection(Property.forName("content"));
-        criteria.add(Restrictions.eq("id", id));
+        Criteria criteria = getSession().createCriteria(Book.class);        
+        criteria.setProjection(Property.forName("content"));        
+        criteria.add(Restrictions.eq("id", id));        
         return (byte[]) criteria.uniqueResult();
     }                    
     
-    public void runCurrentCriteria() {
+    public void runBookListCriteria() {
         Criteria criteria = bookListCriteria.addOrder(Order.asc("name")).getExecutableCriteria(getSession());
         criteria.setProjection(bookProjectionList).setResultTransformer(Transformers.aliasToBean(Book.class));
-        List<Book> list = criteria.setFirstResult(currentPager.getFrom()).setMaxResults(currentPager.getTo()).list();
-        currentPager.setList(list);
+        List<Book> list = criteria.setFirstResult(pager.getFrom()).setMaxResults(pager.getTo()).list();
+        pager.setList(list);
     }
 
     public void update() {
@@ -151,7 +129,7 @@ public class DataHelper {
         Transaction transaction = session.getTransaction();
         transaction.begin();
         
-        for (Object o : currentPager.getList()) {
+        for (Object o : pager.getList()) {
             Book book = (Book)o;
             if (book.isEdit()) {
                 session.update(book);                
@@ -161,42 +139,40 @@ public class DataHelper {
         transaction.commit();
         session.flush();
         session.close();
-    }   
-    
-    public void refreshList() {
-        runCountCriteria();
-        runCurrentCriteria();
-    }    
-
-    private void createBooksCountCriteria() {
-        booksCountCriteria = DetachedCriteria.forClass(Book.class, "b");        
-    }
-    
-    private void createBooksCountCriteria(Criterion criterion) {
-        booksCountCriteria = DetachedCriteria.forClass(Book.class, "b");
-        booksCountCriteria.add(criterion);
-    }
+    }       
 
     private void runCountCriteria() {
         Criteria criteria = booksCountCriteria.getExecutableCriteria(getSession());
         Long total = (Long) criteria.setProjection(Projections.rowCount()).uniqueResult();
-        currentPager.setTotalBooksCount(total);
+        pager.setTotalBooksCount(total);
+    }
+    
+    private void createAliases(DetachedCriteria criteria) {
+        criteria.createAlias("b.author", "author");
+        criteria.createAlias("b.genre", "genre");
+        criteria.createAlias("b.publisher", "publisher");
+    }  
+    
+    public void populateList() {
+        runCountCriteria();
+        runBookListCriteria();
     }
 
-    private void createBookListCriteria() {
+    private void prepareCreterias() {
         bookListCriteria = DetachedCriteria.forClass(Book.class, "b");
-        createAliases();
+        createAliases(bookListCriteria);  
+        
+        booksCountCriteria = DetachedCriteria.forClass(Book.class, "b");
+        createAliases(booksCountCriteria);
     }
     
-    private void createBookListCriteria(Criterion criterion) {
+    private void prepareCreterias(Criterion criterion) {
         bookListCriteria = DetachedCriteria.forClass(Book.class, "b");
+        createAliases(bookListCriteria); 
         bookListCriteria.add(criterion);
-        createAliases();
+        
+        booksCountCriteria = DetachedCriteria.forClass(Book.class, "b");
+        createAliases(booksCountCriteria);
+        booksCountCriteria.add(criterion);
     }
-    
-    private void createAliases() {
-        bookListCriteria.createAlias("b.author", "author");
-        bookListCriteria.createAlias("b.genre", "genre");
-        bookListCriteria.createAlias("b.publisher", "publisher");
-    }    
 }   

@@ -5,53 +5,68 @@
  */
 package ua.training.web.beans;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import ua.training.web.entity.Book;
 
 /**
  *
  * @author Alexandr
- * @param <T>
  */
-public class Pager<T> implements Serializable {
+public class Pager {
+        
+    private static Pager pager;
     
-    private List<T> list;
-    private int selectedPageNumber = 1;
-    private int booksCountOnPage = 5;
+    private int rowIndex;
+    
+    private Pager() {
+        
+    }
+    
+    public static Pager getInstance() {
+        if(pager == null) {
+            pager = new Pager();
+        }
+        return pager;
+    }
+    
+    private List<Book> list;        
     private long totalBooksCount;
-    private final List<Integer> pageNumbers = new ArrayList<Integer>();
+    private int from;
+    private int to;
+    private int selectedBook;
     
     public int getFrom() {
-        return selectedPageNumber * booksCountOnPage - booksCountOnPage;
+        return this.from;
+    }
+    
+    public void setFrom(int from) {
+        this.from = from;
     }
     
     public int getTo() {
-        return booksCountOnPage;
+        return this.to;
     }
     
-    public List<T> getList() {
+    public void setTo(int to) {
+        this.to = to;
+    }
+    
+    public List getList() {        
         return list;
     }        
     
-    public void setList(List<T> list) {
+    public void setList(List list) {
+        rowIndex = -1;
         this.list = list;
+    }        
+    
+    public int getRowIndex() {
+        rowIndex += 1;
+        return rowIndex;
     }
     
-    public int getSelectedPageNumber() {
-        return selectedPageNumber;
-    }
-    
-    public void setSelectedPageNumber(int selectedPageNumber) {
-        this.selectedPageNumber = selectedPageNumber;
-    }
-    
-    public int getBooksCountOnPage() {
-        return booksCountOnPage;
-    }
-    
-    public void setBooksCountOnPage(int booksCountOnPage) {
-        this.booksCountOnPage = booksCountOnPage;
+    public void setRowIndex(int rowIndex) {
+        this.rowIndex = rowIndex;
     }
     
     public long getTotalBooksCount() {
@@ -61,21 +76,5 @@ public class Pager<T> implements Serializable {
     public void setTotalBooksCount (long totalBooksCount) {
         this.totalBooksCount = totalBooksCount;
     }
-    
-    public List<Integer> getPageNumbers() {
-        int pageCount = 0;
         
-        if (totalBooksCount % booksCountOnPage == 0) {
-            pageCount = booksCountOnPage > 0 ? (int) (totalBooksCount / booksCountOnPage) : 0;
-        } else {
-            pageCount = booksCountOnPage > 0 ? (int) (totalBooksCount / booksCountOnPage) + 1 : 0;
-        }
-        
-        pageNumbers.clear();
-        
-        for (int i = 1; i <= pageCount; i++) {
-            pageNumbers.add(i);
-        }
-        return pageNumbers;
-    }
 }

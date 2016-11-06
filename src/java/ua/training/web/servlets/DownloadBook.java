@@ -38,8 +38,8 @@ public class DownloadBook extends HttpServlet {
         try {
             long id = Long.parseLong(request.getParameter("id"));
             Boolean save = Boolean.valueOf(request.getParameter("save"));            
-            byte[] content = DataHelper.getInstance().getContent(id);                                    
-            response.setContentLength(content.length);
+            byte[] content = DataHelper.getInstance().getContent(id);              
+            response.setContentLength(content.length);                                        
             
             if(save) {
                 String bookName = request.getParameter("name");                                
